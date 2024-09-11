@@ -9,5 +9,19 @@ export default defineNuxtConfig({
       tailwindcss: {},
       autoprefixer: {},
     }
+  },
+  modules: [
+    'nuxt-auth-utils',
+    '@nuxt/ui',
+    '@nuxtjs/supabase',
+    '@prisma/nuxt'
+  ],
+  supabase: {
+    redirect: false
+  },
+  prisma: {
+    installCLI: false,
+    installClient: false,
+    installStudio: false
   }
 })
