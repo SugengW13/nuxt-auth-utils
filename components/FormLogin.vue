@@ -2,6 +2,7 @@
 import { object, string, type InferType } from 'yup'
 import type { FormSubmitEvent } from '#ui/types'
 
+const { fetch } = useUserSession()
 const $router = useRouter()
 
 const schema = object({
@@ -18,8 +19,8 @@ const state = reactive({
   password: 'password'
 })
 
-async function onSubmit (event: FormSubmitEvent<Schema>) {
-  const {email, password} = event.data
+async function onSubmit(event: FormSubmitEvent<Schema>) {
+  const { email, password } = event.data
 
   try {
     const res = await $fetch('/api/auth/login', {
@@ -29,6 +30,8 @@ async function onSubmit (event: FormSubmitEvent<Schema>) {
     })
 
     useToast().add({ title: res.message, color: 'green' })
+
+    await fetch()
 
     navigateTo('/authenticated')
   } catch (e) {
@@ -56,4 +59,3 @@ async function onSubmit (event: FormSubmitEvent<Schema>) {
     </UButton>
   </UForm>
 </template>
-

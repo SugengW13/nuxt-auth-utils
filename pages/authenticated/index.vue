@@ -1,4 +1,6 @@
 <script setup lang="ts">
+definePageMeta({middleware: 'auth'})
+
 const { loggedIn, user, session, fetch, clear } = useUserSession()
 
 onMounted(async () => {
@@ -6,8 +8,15 @@ onMounted(async () => {
 })
 
 async function onClickClearSession() {
-  await clear()
-  await fetch()
+  try {
+    await clear()
+    await fetch()
+
+    useToast().add({ title: 'Success', color: 'green' })
+    navigateTo('/login')
+  } catch(_) {
+    useToast().add({ title: 'Unauthenticated', color: 'red' })
+  }
 }
 </script>
 
