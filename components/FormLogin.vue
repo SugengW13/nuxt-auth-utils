@@ -19,8 +19,12 @@ const state = reactive({
   password: 'password'
 })
 
+const isLoading = ref(false)
+
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   const { email, password } = event.data
+
+  isLoading.value = true
 
   try {
     const res = await $fetch('/api/auth/login', {
@@ -36,6 +40,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     navigateTo('/authenticated')
   } catch (e) {
     useToast().add({ title: 'Wrong Email or Password', color: 'red' })
+  } finally {
+    isLoading.value = false
   }
 }
 </script>
@@ -50,7 +56,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       <UInput v-model="state.password" type="password" />
     </UFormGroup>
 
-    <UButton type="submit" block>
+    <UButton type="submit" block :loading="isLoading" :disabled="isLoading">
       Login
     </UButton>
 

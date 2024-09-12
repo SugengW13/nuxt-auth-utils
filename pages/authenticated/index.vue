@@ -1,21 +1,26 @@
 <script setup lang="ts">
-definePageMeta({middleware: 'auth'})
+definePageMeta({ middleware: 'is-auth' })
 
 const { loggedIn, user, session, fetch, clear } = useUserSession()
+
+const isLoading = ref(false)
 
 onMounted(async () => {
   await fetch()
 })
 
-async function onClickClearSession() {
+async function onClickLogout() {
+  isLoading.value = true
+
   try {
     await clear()
     await fetch()
 
-    useToast().add({ title: 'Success', color: 'green' })
     navigateTo('/login')
-  } catch(_) {
+  } catch (_) {
     useToast().add({ title: 'Unauthenticated', color: 'red' })
+  } finally {
+    isLoading.value = false
   }
 }
 </script>
@@ -23,17 +28,11 @@ async function onClickClearSession() {
 <template>
   <div class="h-screen flex items-center justify-center">
     <div class="max-w-2xl space-y-3">
-      <p>Logged In : 
+      <p>Logged In :
         <span>{{ loggedIn }}</span>
       </p>
-      <p>User : 
-        <span>{{ user }}</span>
-      </p>
-      <p>Session : 
-        <span>{{ session }}</span>
-      </p>
 
-      <u-button color="red" @click="onClickClearSession">Clear Session</u-button>
+      <u-button block color="red" :loading="isLoading" :disabled="isLoading" @click="onClickLogout">Logout</u-button>
     </div>
   </div>
 </template>

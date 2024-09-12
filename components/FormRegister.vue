@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, object, string, type InferType } from 'yup'
+import { ref as r, object, string, type InferType } from 'yup'
 import type { FormSubmitEvent } from '#ui/types'
 
 const $router = useRouter()
@@ -12,7 +12,7 @@ const schema = object({
   passwordConfirmation: string()
     .required('Required')
     .min(8, 'Must be at least 8 characters')
-    .oneOf([ref('password')], 'Passwords must match')
+    .oneOf([r('password')], 'Passwords must match')
 })
 
 type Schema = InferType<typeof schema>
@@ -23,8 +23,12 @@ const state = reactive({
   passwordConfirmation: 'password'
 })
 
+const isLoading = ref(false)
+
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   const { email, password, passwordConfirmation } = event.data
+
+  isLoading.value = true
 
   try {
     const res = await $fetch('/api/auth/register', {
@@ -38,6 +42,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     navigateTo('/login')
   } catch (e) {
     useToast().add({ title: 'Account Already Registered', color: 'red' })
+  } finally {
+    isLoading.value = false
   }
 }
 </script>
@@ -56,7 +62,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       <UInput v-model="state.passwordConfirmation" type="password" />
     </UFormGroup>
 
-    <UButton type="submit" block>
+    <UButton type="submit" block :loading="isLoading" :disabled="isLoading">
       Register
     </UButton>
 
